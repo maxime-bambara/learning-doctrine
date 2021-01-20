@@ -27,10 +27,15 @@ class Task
     private $description;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Project", inversedBy="tasks", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="App\Entity\Project", inversedBy="tasks", cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $project;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Employee", inversedBy="tasks")
+     */
+    private $assignedTo;
 
     public function getId(): ?int
     {
@@ -69,6 +74,18 @@ class Task
     public function setProject(?Project $project): self
     {
         $this->project = $project;
+
+        return $this;
+    }
+
+    public function getAssignedTo(): ?Employee
+    {
+        return $this->assignedTo;
+    }
+
+    public function setAssignedTo(?Employee $assignedTo): self
+    {
+        $this->assignedTo = $assignedTo;
 
         return $this;
     }

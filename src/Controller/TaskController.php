@@ -2,8 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\Employee;
 use App\Entity\Project;
 use App\Entity\Task;
+use App\Repository\TaskRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\Entity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -48,5 +52,42 @@ class TaskController extends AbstractController
         $entityManger->flush();
 
         return new Response(sprintf('Tâche %s créée', $task->getTitle()));
+    }
+
+    /**
+     * @Route("/count-tasks")
+     * @param TaskRepository $taskRepository
+     * @return Response
+     */
+    public function countTasks(TaskRepository $taskRepository): Response
+    {
+        $tasks = $taskRepository->findAll();
+        return new Response(sprintf('%s tâches existantes', count($tasks)));
+    }
+
+    /**
+     * @Route("/find-task/{id}")
+     * @param Task $task
+     * @return Response
+     */
+    public function findTask(Task $task): Response
+    {
+        return new Response(sprintf('Titre de la tâche : %s', $task->getTitle()));
+    }
+
+    /**
+     * @Route("/assign-task/{task_id}/{employee_id}")
+     *
+     *
+     * @param Task $task
+     * @param Employee $employee
+     * @param EntityManagerInterface $entityManager
+     * @return Response
+     */
+    public function assignTaskToEmployee(Task $task, Employee $employee, EntityManagerInterface $entityManager)
+    {
+        $task->setAssignedTo($employee);
+        $entityManager->flush();
+        return new Response(sprintf('La tâche : %s a été assignée à %s', $task->getTitle(), $employee->getUsername()));
     }
 }
